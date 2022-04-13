@@ -1,34 +1,33 @@
+tool
 extends EditorProperty
 class_name Enable_BCI
 
 var checkbox = CheckBox.new()
-var spinbox = SpinBox.new()
-var itemlist = ItemList.new()
+
 var edited_control = null
 var has_refreshed = false
 var _checked = false
-var Frequency
 var _Script  = load("res://addons/BCI_Plugin/Flash_node_Script.gd")
-var freq = 0.5
+
 var data = []
+#func _print_data():
+#	print(data)
+#
+#func _update_data(value):
+#	data.append(value)
 
-func _print_data():
-	print(data)
-
-func _update_data(value):
-	data.append(value)
-
+#initializes the 
 func _init():
 	_add_checkbox()
 	
-func _add_spinbox():
-	label = "Frequency:"
-	spinbox.connect("value_changed", self, "_update_freq")
-	self.add_child(spinbox)
 	
-
+#_add_checkbox
+#adds the checkbox to enable and disable BCI 
+#connects the checkbox to the "toggled" signal
+#when a toggled signal is emited then _on_checkbox_checked is called on self
+#adds the checkbox to sidebar
 func _add_checkbox():
-	label = "Enable_BCI"
+	label = "Enable BCI"
 	checkbox.connect("toggled", self, "_on_checkbox_checked")
 	add_child(checkbox)
 

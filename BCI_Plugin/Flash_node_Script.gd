@@ -9,11 +9,11 @@ var recv_data_thread
 var data = ""
 var possible_frequencies = [1, 2, 5, 10, 15, 30, 60]
 export var Enable_Flashing = true
-export(int, 256) var Diplay_frequency = 60
+#export(int, 256) var Diplay_frequency = 60
 export(int, 256) var flash_frequency_hz = 1
 export var signal_to_emit = "button_down"
 export var host = "127.0.0.1"
-export var port = 40674
+export var port = "40674"
 
 var _server = StreamPeerTCP.new()
 
@@ -42,8 +42,7 @@ func _ready():
 	self.start_blinking(flash_interval)
 	self.start_datatimer(send_data_interval)
 
-	if !_server.is_connected_to_host():
-		print("Unable to connect")
+	if !_server.get_status() == _server.STATUS_CONNECTED:
 		set_process(false)
 	else:
 		recv_data_thread.start(self, "_receive_data")
@@ -88,21 +87,18 @@ func _receive_data():
 		var temp = ""
 		while temp != "&":
 			headset_data = headset_data + temp
-			temp = _server.get_utf8_string(1) 
-		print(headset_data)
+			temp = _server.get_string(1) 
+#		print(headset_data)
 		emit_signal("node_received", headset_data)
-
 
 func _on_send_data():
 	if Enable_Flashing:
 		var output = ""
-		var separator = "--"
+		var separator = "\n"
 		for s in get_tree().get_nodes_in_group("BCI_Enabled"):
-			output +=  separator + str(s)+ ", "+ str(s.flash_frequency_hz)+ "hz, " + "Is Flash Enabled: "+ str(s.Enable_Flashing) 
+			output +=  str(s)+ ", "+ str(s.flash_frequency_hz)+ "hz, " + "Is Flash Enabled: "+ str(s.Enable_Flashing) + separator
 		_server.put_data(output.to_ascii())
 #		print(output)
-
-
 
 func _exit_tree():
 	recv_data_thread.wait_to_finish() 
@@ -110,6 +106,4 @@ func _exit_tree():
 	
 func _notification(what):	
 	if what == MainLoop.NOTIFICATION_WM_QUIT_REQUEST: 
-		print("in if")     
-
 		get_tree().quit() # default behavior
